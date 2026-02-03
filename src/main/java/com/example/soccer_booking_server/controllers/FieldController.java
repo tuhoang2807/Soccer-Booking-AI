@@ -1,8 +1,8 @@
 package com.example.soccer_booking_server.controllers;
 
-
 import com.example.soccer_booking_server.dto.ResponseFormat;
 import com.example.soccer_booking_server.entitis.Field;
+import com.example.soccer_booking_server.enums.FieldType;
 import com.example.soccer_booking_server.services.FieldService;
 import io.swagger.v3.oas.annotations.Operation;
 import jakarta.annotation.security.PermitAll;
@@ -34,6 +34,31 @@ public class FieldController {
         return ResponseEntity.ok(new  ResponseFormat<>(200, "Thành công", fieldService.getFieldById(id)));
     }
 
+    @Operation(summary = "Get field by type")
+    @GetMapping("/type/{type}")
+    @PermitAll
+    public ResponseEntity<ResponseFormat<List<Field>>> getFieldByType(@PathVariable String type) {
+        return ResponseEntity.ok(new ResponseFormat<>(200, "Thành công", fieldService.getFieldByType(type)));
+    }
+
+    @Operation(summary = "Get all field types")
+    @GetMapping("/types")
+    @PermitAll
+    public ResponseEntity<ResponseFormat<List<FieldType>>> getAllFieldTypes() {
+        return ResponseEntity.ok(
+                new ResponseFormat<>(200, "Thành công", List.of(FieldType.values()))
+        );
+    }
+
+    @Operation(summary = "Search Filed with Name and type")
+    @GetMapping("/search")
+    @PermitAll
+    public ResponseEntity<ResponseFormat<List<FieldType>>> searchFieldWithType(@RequestParam String type, String fieldName) {
+        return ResponseEntity.ok(
+                new ResponseFormat<>(200, "Thành công", List.of(FieldType.values()))
+        );
+    }
+
     @Operation(summary = "Delete field by id")
     @PreAuthorize("hasAnyRole('ADMIN','STAFF')")
     @DeleteMapping("/{id}")
@@ -44,7 +69,7 @@ public class FieldController {
 
     @Operation(summary = "Create field")
     @PreAuthorize("hasAnyRole('ADMIN','STAFF')")
-    @PostMapping
+    @PostMapping    
     public ResponseEntity<ResponseFormat<Field>> createField(@RequestBody Field newField) {
         return ResponseEntity.ok(new ResponseFormat<>(201, "Tạo sân bóng thành công!", fieldService.createField(newField)));
     }

@@ -18,7 +18,6 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @Builder
 public class Field {
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "field_id")
@@ -37,16 +36,13 @@ public class Field {
     @Column(name = "image_url", length = 255)
     private String imageUrl;
 
-    @Column(name = "price_per_slot", nullable = false)
-    private BigDecimal pricePerSlot;
-
     @Enumerated(EnumType.STRING)
     @Column(name = "status", nullable = false)
     private FieldStatus status = FieldStatus.ACTIVE;
 
     @Column(name = "created_at", insertable = false, updatable = false)
-    private LocalDateTime createdAt;
+    private LocalDateTime createdAt = LocalDateTime.now();
 
     @Column(name = "updated_at", insertable = false, updatable = false)
-    private LocalDateTime updatedAt;
+    private LocalDateTime updatedAt = LocalDateTime.now();
 }

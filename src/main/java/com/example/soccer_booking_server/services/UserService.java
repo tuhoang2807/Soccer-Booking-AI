@@ -8,6 +8,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.util.*;
 
 @Service
@@ -134,4 +135,7 @@ public class UserService {
         userRepository.deleteById(id);
     }
 
+    public BigDecimal getUserCoin(Integer userId) {
+       return userRepository.findCoinBalanceByUserId(userId);
+    }
 }

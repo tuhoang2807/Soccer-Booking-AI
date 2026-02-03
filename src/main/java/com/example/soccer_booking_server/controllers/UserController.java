@@ -8,6 +8,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+
+import java.math.BigDecimal;
 import java.util.List;
 
 @RestController
@@ -25,8 +27,18 @@ public class UserController {
         return ResponseEntity.ok(new ResponseFormat<>(200, "Thành công", users));
     }
 
+    @Operation(summary = "Get user coin")
+    @PermitAll
+    @GetMapping("/coin/{id}")
+    public ResponseEntity<ResponseFormat<BigDecimal>> getUserCoin(@PathVariable Integer id) {
+
+        BigDecimal coin = userService.getUserCoin(id);
+        return ResponseEntity.ok(new ResponseFormat<>(200, "Thành công", coin));
+    }
+
+
     @Operation(summary = "Get user by id")
-    @PreAuthorize("hasAnyRole('ADMIN','STAFF')")
+    @PermitAll
     @GetMapping("/{id}")
     public ResponseEntity<ResponseFormat<Users>> getUserById(@PathVariable Integer id) {
         Users user = userService.getUserById(id);
@@ -42,7 +54,7 @@ public class UserController {
     }
 
     @Operation(summary = "Update user by id")
-    @PreAuthorize("hasAnyRole('ADMIN','STAFF')")
+    @PermitAll
     @PutMapping("/{id}")
     public ResponseEntity<ResponseFormat<Users>> updateUser(@PathVariable Integer id, @RequestBody Users user) {
         Users updatedUser = userService.updateUser(id, user);

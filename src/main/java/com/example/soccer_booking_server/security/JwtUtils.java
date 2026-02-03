@@ -22,7 +22,7 @@ public class JwtUtils {
                 .claim("role", user.getRole().name())
                 .setIssuedAt(new Date())
                 .setExpiration(new Date(System.currentTimeMillis() + jwtExpirationMs))
-                .signWith(key) // dùng key tự động
+                .signWith(key)
                 .compact();
     }
 

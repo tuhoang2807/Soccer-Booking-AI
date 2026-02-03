@@ -1,11 +1,13 @@
 package com.example.soccer_booking_server.services;
 
 import com.example.soccer_booking_server.entitis.Field;
+import com.example.soccer_booking_server.enums.FieldType;
 import com.example.soccer_booking_server.exception.NotFoundException;
 import com.example.soccer_booking_server.repository.FieldRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
-
+import org.springframework.web.server.ResponseStatusException;
 import java.util.List;
 
 @Service
@@ -19,7 +21,20 @@ public class FieldService {
 
     public Field getFieldById(Integer id) {
         return fieldRepository.findById(id)
-                .orElseThrow(() -> new NotFoundException("Field not found"));
+                .orElseThrow(() -> new NotFoundException("Không có sân này!"));
+    }
+
+    public List<Field> getFieldByType(String type) {
+        FieldType fieldType;
+        try {
+            fieldType = FieldType.valueOf(type.trim().toUpperCase());
+        } catch (IllegalArgumentException e) {
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST,
+                    "type không hợp lệ. Ví dụ: SEVEN, FIVE, TEN"
+            );
+        }
+        return fieldRepository.findByType(fieldType);
     }
 
     public Field createField(Field field) {
@@ -34,7 +49,6 @@ public class FieldService {
         existingField.setType(updatedField.getType());
         existingField.setDescription(updatedField.getDescription());
         existingField.setImageUrl(updatedField.getImageUrl());
-        existingField.setPricePerSlot(updatedField.getPricePerSlot());
         existingField.setStatus(updatedField.getStatus());
 
         return fieldRepository.save(existingField);

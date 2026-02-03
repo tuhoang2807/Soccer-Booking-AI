@@ -1,11 +1,13 @@
 package com.example.soccer_booking_server.controllers;
 
+import com.example.soccer_booking_server.dto.LoginResponseDto;
 import com.example.soccer_booking_server.dto.ResponseFormat;
+import com.example.soccer_booking_server.dto.UserInfoDTO;
 import com.example.soccer_booking_server.entitis.RefreshToken;
 import com.example.soccer_booking_server.entitis.Users;
 import com.example.soccer_booking_server.enums.MatchStatus;
 import com.example.soccer_booking_server.enums.Role;
-import com.example.soccer_booking_server.exception.NotFoundException;
+
 import com.example.soccer_booking_server.payload.LoginRequest;
 import com.example.soccer_booking_server.payload.RegisterRequest;
 import com.example.soccer_booking_server.repository.RefreshTokenRepository;
@@ -26,7 +28,7 @@ import java.time.LocalDateTime;
 import java.util.Map;
 
 @RestController
-@RequestMapping("/api/auth")
+@RequestMapping("/api/v1/auth")
 @RequiredArgsConstructor
 public class AuthController {
 
@@ -41,25 +43,45 @@ public class AuthController {
         try {
             Authentication auth = authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(request.getEmail(), request.getPassword()));
+
             Users user = usersRepository.findByEmail(request.getEmail())
                     .orElseThrow(() -> new RuntimeException("Không tìm thấy người dùng này!"));
+
             String accessToken = jwtUtils.generateAccessToken(user);
+
             refreshTokenRepository.deleteByUser(user);
             String refreshTokenStr = jwtUtils.generateRefreshToken();
+
             RefreshToken refreshToken = RefreshToken.builder()
                     .token(refreshTokenStr)
                     .user(user)
                     .expiryDate(LocalDateTime.now().plusDays(7))
                     .build();
             refreshTokenRepository.save(refreshToken);
-            Map<String, String> tokens = Map.of(
-                    "accessToken", accessToken,
-                    "refreshToken", refreshTokenStr
-            );
-            return ResponseEntity.ok(new ResponseFormat<>(200, "Đăng nhập thành công", tokens)
-            );
+
+            // ✅ user info tối thiểu
+            UserInfoDTO userInfo = UserInfoDTO.builder()
+                    .userId(user.getUserId())
+                    .fullName(user.getFullName())
+                    .email(user.getEmail())
+                    .phone(user.getPhone())
+                    .teamName(user.getTeamName())
+                    .teamLeaderName(user.getTeamLeaderName())
+                    .coinBalance(user.getCoinBalance())
+                    .build();
+
+            // ✅ response gộp token + user
+            LoginResponseDto data = LoginResponseDto.builder()
+                    .accessToken(accessToken)
+                    .refreshToken(refreshTokenStr)
+                    .user(userInfo)
+                    .build();
+
+            return ResponseEntity.ok(new ResponseFormat<>(200, "Đăng nhập thành công", data));
         } catch (Exception ex) {
-            throw new NotFoundException("Sai email hoặc mật khẩu!");
+            // 🚀 nên trả 401 thay vì NotFound
+            return ResponseEntity.status(401)
+                    .body(new ResponseFormat<>(401, "Sai email hoặc mật khẩu!", null));
         }
     }
 
@@ -98,6 +120,7 @@ public class AuthController {
                 .matchStatus(MatchStatus.NOT_LOOKING)
                 .createdAt(LocalDateTime.now())
                 .isActive(true)
+                .loyaltyPoints(0)
                 .teamName(request.getTeamName())
                 .teamLeaderName(request.getTeamLeadName())
                 .role(Role.USER)

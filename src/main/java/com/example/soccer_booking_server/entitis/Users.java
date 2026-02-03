@@ -5,6 +5,8 @@ import com.example.soccer_booking_server.enums.Role;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 import lombok.*;
+
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @Entity
@@ -50,6 +52,9 @@ public class Users {
 
     @Column(name = "loyalty_points")
     private Integer loyaltyPoints = 0;
+
+    @Column(name = "coin_balance", nullable = false)
+    private BigDecimal coinBalance = BigDecimal.ZERO;
 
     @Column(name = "is_active")
     private Boolean isActive = true;
