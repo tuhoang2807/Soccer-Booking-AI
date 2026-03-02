@@ -54,6 +54,7 @@ public class Users {
     private Integer loyaltyPoints = 0;
 
     @Column(name = "coin_balance", nullable = false)
+    @Builder.Default
     private BigDecimal coinBalance = BigDecimal.ZERO;
 
     @Column(name = "is_active")

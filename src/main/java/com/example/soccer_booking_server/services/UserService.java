@@ -61,6 +61,7 @@ public class UserService {
         }
 
         user.setPasswordHash(passwordEncoder.encode(user.getPasswordHash()));
+        user.setCoinBalance(new BigDecimal(0));
 
         return userRepository.save(user);
     }
