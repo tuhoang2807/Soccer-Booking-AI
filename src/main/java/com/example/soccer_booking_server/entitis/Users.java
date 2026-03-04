@@ -60,10 +60,10 @@ public class Users {
     @Column(name = "is_active")
     private Boolean isActive = true;
 
-    @Column(name = "team_name", nullable = false, length = 100)
+    @Column(name = "team_name", nullable = true, length = 100)
     private String teamName;
 
-    @Column(name = "team_leader_name", nullable = false, length = 100)
+    @Column(name = "team_leader_name", nullable = true, length = 100)
     private String teamLeaderName;
 
     @Column(name = "created_at", insertable = false, updatable = false)
