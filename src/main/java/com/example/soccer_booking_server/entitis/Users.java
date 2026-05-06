@@ -72,4 +72,10 @@ public class Users {
     @Column(name = "updated_at", insertable = false, updatable = false)
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private LocalDateTime updatedAt = LocalDateTime.now();
+
+    @Column(name = "reset_otp", length = 10)
+    private String resetOtp;
+
+    @Column(name = "reset_otp_expiry")
+    private LocalDateTime resetOtpExpiry;
 }

@@ -1,11 +1,17 @@
 package com.example.soccer_booking_server.controllers;
 
+import com.example.soccer_booking_server.dto.BookingHistoryItemDTO;
 import com.example.soccer_booking_server.dto.ai.AiPreferencesResponse;
+import com.example.soccer_booking_server.enums.BookingStatus;
+import com.example.soccer_booking_server.services.BookingAppService;
 import com.example.soccer_booking_server.services.ai.AiRecommenderClient;
-import java.util.List;
-import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/v1/recommendations")
@@ -13,16 +19,29 @@ import org.springframework.web.bind.annotation.*;
 public class RecommendationTestController {
 
     private final AiRecommenderClient aiClient;
+    private final BookingAppService bookingAppService;
 
     @GetMapping("/test-ai")
     public AiPreferencesResponse testAi(@RequestParam Integer userId) {
-        // TẠM THỜI: hardcode giống bạn test trên Swagger
-        List<Map<String, Object>> history = List.of(
-                Map.of("user_id", userId, "booking_date", "2026-03-01", "slot_id", 5, "field_type", "SEVEN", "field_id", 3),
-                Map.of("user_id", userId, "booking_date", "2026-03-08", "slot_id", 5, "field_type", "SEVEN", "field_id", 3),
-                Map.of("user_id", userId, "booking_date", "2026-03-10", "slot_id", 6, "field_type", "SEVEN", "field_id", 5)
+
+        List<BookingStatus> goodStatuses = List.of(
+                BookingStatus.DEPOSITED,
+                BookingStatus.CHECKED_IN,
+                BookingStatus.COMPLETED
         );
 
-        return aiClient.getPreferences(userId, history);
+        var page = bookingAppService.getUserHistory(userId, 0, 200, goodStatuses);
+        List<BookingHistoryItemDTO> history = page.getContent();
+
+        List<Map<String, Object>> userBookings = history.stream().map(h -> {
+            Map<String, Object> m = new HashMap<>();
+            m.put("user_id", userId);
+            m.put("booking_date", h.getBookingDate().toString());
+            m.put("slot_id", h.getSlotId());
+            m.put("field_id", h.getFieldId());
+            return m;
+        }).collect(Collectors.toList());
+
+        return aiClient.getPreferences(userId, userBookings);
     }
 }

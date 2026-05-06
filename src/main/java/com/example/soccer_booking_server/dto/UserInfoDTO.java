@@ -1,5 +1,6 @@
 package com.example.soccer_booking_server.dto;
 
+import com.example.soccer_booking_server.enums.Role;
 import lombok.*;
 
 import java.math.BigDecimal;
@@ -16,4 +17,5 @@ public class UserInfoDTO {
     private String teamName;
     private String teamLeaderName;
     private BigDecimal coinBalance;
+    private Role role;
 }

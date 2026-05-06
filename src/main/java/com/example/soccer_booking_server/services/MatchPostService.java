@@ -45,7 +45,9 @@ public class MatchPostService {
 
         // 3) (Tuỳ bạn) validate booking hợp lệ: không bị huỷ, không hết hạn...
         // TODO: nếu Booking có status: check status ở đây.
-
+        if (booking.getStatus() != BookingStatus.DEPOSITED) {
+            throw new RuntimeException("ONLY_DEPOSITED_BOOKING_CAN_CREATE_MATCH_POST");
+        }
         // 4) Nếu booking đã từng MATCHED -> cấm đăng nữa
         boolean hasMatched = matchPostRepository.existsByBooking_BookingIdAndStatus(req.getBookingId(), MatchPostStatus.MATCHED);
         if (hasMatched) {

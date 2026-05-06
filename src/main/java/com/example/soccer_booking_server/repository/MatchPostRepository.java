@@ -61,4 +61,17 @@ public interface MatchPostRepository extends JpaRepository<MatchPost, Long> {
     order by mp.createdAt desc
 """)
     List<Object[]> findAllForList();
+
+
+    @Query("""
+    select mp
+    from MatchPost mp
+    join fetch mp.booking b
+    join fetch b.slot s
+    where mp.status in (
+        com.example.soccer_booking_server.enums.MatchPostStatus.OPEN,
+        com.example.soccer_booking_server.enums.MatchPostStatus.MATCHED
+    )
+""")
+    List<MatchPost> findAllActivePosts();
 }

@@ -3,5 +3,6 @@ package com.example.soccer_booking_server.enums;
 public enum MatchPostStatus {
     OPEN,
     MATCHED,
-    DELETED
+    DELETED,
+    EXPIRED
 }
